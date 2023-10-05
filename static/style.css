@@ -47,6 +47,12 @@ select {
     flex-wrap: wrap;
 }
 
+.gallery {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+}
+
 .code {
     font-family: monospace;
     box-shadow: #b9b9b9 0px 10px 20px -5px;

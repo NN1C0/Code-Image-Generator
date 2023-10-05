@@ -8,11 +8,14 @@
 
 {% block content %}
 <style>
-    {{ style_definitions }}
-
     .code {
-        background-color: {{ style_bg_color }};
+        background-color: {{ style_bg_colors }};
     }
+
+    {% for s in style_definitions %}
+        {{s}}
+    {% endfor %}
+
 </style>
 <script>
     document.addEventListener("DOMContentLoaded", () => {
@@ -29,9 +32,6 @@
             {% endfor %}
         </select>
     </div>
-    <div class="code">
-        {{ highlighted_code | safe }}
-    </div>
     <div class="controls">
         <button formmethod="get" formaction="{{ url_for('code') }}">
             ⬅️ Back
@@ -41,4 +41,9 @@
         </button>
     </div>
 </form>
+<div class="gallery">
+    {% for c in styled_codes %}
+            {{ c | safe }}
+    {%endfor%}
+</div>
 {% endblock content %}

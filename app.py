@@ -4,7 +4,7 @@ from pygments.formatters import HtmlFormatter
 from pygments.lexers import Python3Lexer
 from pygments.styles import get_all_styles
 import base64
-from utils import take_screenshot_from_url
+import utils
 
 app = Flask(__name__)
 app.secret_key = "2e9ac41b1e0b66a8d93d66400e2300c4b4c2953f"
@@ -54,11 +54,9 @@ def style():
         "message": "Select your style",
         "all_styles": list(get_all_styles()),
         "style": session["style"],
-        "style_definitions": formatter.get_style_defs(),
-        "style_bg_color": formatter.style.background_color,
-        "highlighted_code": highlight(
-            session["code"], Python3Lexer(), formatter
-        ),
+        "style_definitions": utils.get_all_style_definitions(),
+        "style_bg_colors": utils.get_all_background_colors(),
+        "styled_codes": utils.create_styled_codes(session["code"]),
     }
     return render_template("style_selection.html", **context)
 
@@ -79,7 +77,7 @@ def image():
         "url": request.host_url,
     }
     target_url = request.host_url + url_for("style")
-    image_bytes = take_screenshot_from_url(target_url, session_data)
+    image_bytes = utils.take_screenshot_from_url(target_url, session_data)
     context = {
         "message": "Done! 🎉",
         "image_b64": base64.b64encode(image_bytes).decode("utf-8"),
