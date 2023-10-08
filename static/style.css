@@ -27,10 +27,6 @@ h1 a {
     color: inherit;
 }
 
-span {
-    color: deepskyblue;
-}
-
 button,
 select {
     cursor: pointer;

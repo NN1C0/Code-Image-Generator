@@ -1,10 +1,12 @@
-from flask import Flask, render_template, session, redirect, request, url_for
+from flask import Flask, render_template, session, redirect, request, url_for, send_file
 from pygments import highlight
 from pygments.formatters import HtmlFormatter
 from pygments.lexers import Python3Lexer
 from pygments.styles import get_all_styles
 import base64
 import utils
+from PIL import Image
+from io import BytesIO
 
 app = Flask(__name__)
 app.secret_key = "2e9ac41b1e0b66a8d93d66400e2300c4b4c2953f"
@@ -57,6 +59,7 @@ def style():
         "style_definitions": utils.get_all_style_definitions(),
         "style_bg_colors": utils.get_all_background_colors(),
         "styled_codes": utils.create_styled_codes(session["code"]),
+        "highlighted_codes_list": utils.generate_highlighted_codes(session["code"]),
     }
     return render_template("style_selection.html", **context)
 
@@ -71,15 +74,27 @@ def save_style():
 
 @app.route("/image", methods=["GET"])
 def image():
+    style_name = request.args.get("style")
     session_data = {
         "name": app.config["SESSION_COOKIE_NAME"],
         "value": request.cookies.get(app.config["SESSION_COOKIE_NAME"]),
         "url": request.host_url,
     }
     target_url = request.host_url + url_for("style")
-    image_bytes = utils.take_screenshot_from_url(target_url, session_data)
+    image_bytes = utils.take_screenshot_from_url(target_url, session_data, style_name)
     context = {
         "message": "Done! 🎉",
         "image_b64": base64.b64encode(image_bytes).decode("utf-8"),
     }
-    return render_template("image.html", **context)
+
+    fileObject  = BytesIO()
+    image = Image.open(BytesIO(image_bytes))
+    image.save(fileObject, "PNG")
+    fileObject.seek(0)
+
+    return send_file(fileObject, mimetype="PNG", as_attachment=True, download_name="Your_Code.png", )
+    #return render_template("image.html", **context)
+
+@app.route("/download_image", methods=["GET"])
+def download_image():
+    pass

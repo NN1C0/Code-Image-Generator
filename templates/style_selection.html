@@ -8,10 +8,6 @@
 
 {% block content %}
 <style>
-    .code {
-        background-color: {{ style_bg_colors }};
-    }
-
     {% for s in style_definitions %}
         {{s}}
     {% endfor %}
@@ -42,8 +38,15 @@
     </div>
 </form>
 <div class="gallery">
-    {% for c in styled_codes %}
-            {{ c | safe }}
+    {% for c in highlighted_codes_list %}
+    <div>
+        <div class="code {{c.style_name}}" style="background-color: {{c.background_color}}">
+            {{ c.highlighted_code | safe }}
+        </div>
+        <div>
+            {{c.style_name}} - <a  href="{{ url_for('image') }}?style={{c.style_name}}">Download</a>
+        </div>
+    </div>
     {%endfor%}
 </div>
 {% endblock content %}

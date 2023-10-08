@@ -5,16 +5,17 @@ from pygments import highlight
 from pygments.formatters import HtmlFormatter
 from pygments.lexers import Python3Lexer
 from pygments.styles import get_all_styles
+from lib.Highlighted_Code import Highlighted_Code
 
-def take_screenshot_from_url(url, session_data):
+def take_screenshot_from_url(url, session_data, target_style_name):
     with sync_playwright() as playwright:
-        webkit = playwright.webkit
-        browser = webkit.launch()
+        chromium = playwright.chromium
+        browser = chromium.launch()
         browser_context = browser.new_context(device_scale_factor=2)
         browser_context.add_cookies([session_data])
         page = browser_context.new_page()
         page.goto(url)
-        screenshot_bytes = page.locator(".code").screenshot()
+        screenshot_bytes = page.locator(".code."+target_style_name).screenshot()
         browser.close()
         return screenshot_bytes
     
@@ -45,3 +46,12 @@ def get_all_background_colors() -> []:
         all_bg.append(HtmlFormatter(style=s,).style.background_color)
 
     return all_bg
+
+def generate_highlighted_codes(code) -> []:
+    codes_list = []
+    style_list = get_all_styles()
+    
+    for s in style_list:
+        codes_list.append(Highlighted_Code(code, s))
+
+    return codes_list
